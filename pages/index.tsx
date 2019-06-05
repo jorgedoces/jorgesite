@@ -1,22 +1,12 @@
 import GlobalStyle from '../components/global-style';
 import { Title } from '../components/styled';
-import { createClient } from '../utils/contentful';
+import { getBrandEntries, getProductEntries } from '../utils/contentful';
 import { NextFunctionComponent } from 'next';
-import { EntryCollection, Entry, Asset } from 'contentful';
+import { EntryCollection } from 'contentful';
+import { Head } from 'next/document';
+import { IBrand, IProduct } from '../utils/interfaces';
 
-interface IProduct {
-  title: string;
-  brand: Entry<IBrand>;
-  categories: Entry<ICategory>[];
-  photos: Asset[];
-}
-interface IBrand {
-  name: string;
-  url: string;
-}
-interface ICategory {
-  title: string;
-}
+
 
 interface IProps {
   brands: EntryCollection<IBrand>;
@@ -27,6 +17,10 @@ const Index: NextFunctionComponent<IProps> = ({ brands, products }) => {
   return (
     <>
       <GlobalStyle />
+      <Head>
+        <title>Jorge Doces</title>
+        <meta key="viewport" name="viewport" content="initial-scale=1.0, width=device-width" />
+      </Head>
       <Title>Jorge Doces</Title>
       <h2>Brands</h2>
       <ul>
@@ -54,15 +48,8 @@ const Index: NextFunctionComponent<IProps> = ({ brands, products }) => {
 };
 
 Index.getInitialProps = async () => {
-  const client = createClient();
-
-  const brands = await client.getEntries<IBrand>({
-    content_type: 'brand',
-  });
-
-  const products = await client.getEntries<IProduct>({
-    content_type: 'product',
-  });
+  const brands = await getBrandEntries();
+  const products = await getProductEntries();
 
   return { brands, products };
 };
